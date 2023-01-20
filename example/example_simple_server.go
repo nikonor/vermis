@@ -39,6 +39,8 @@ func main() {
 	srv.Show("begin")
 	defer srv.Show("end")
 
+	time.Sleep(time.Second / 1000)
+	fmt.Print("Enter numbers + Enter ( 0 - for exit ): ")
 	for {
 		var d int
 		fmt.Scanf("%d", &d)
