@@ -6,9 +6,7 @@ import (
 	"os"
 )
 
-const bufferSize = 128
-
-func (s *SimpleVermis) readByLines(file *os.File, f func([]byte) (any, error)) error {
+func (s *SimpleVermis) readByLines(file *os.File, f UnmarshalFunc) error {
 
 	scanner := bufio.NewScanner(file)
 

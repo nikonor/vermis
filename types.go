@@ -9,5 +9,6 @@ type Vermis interface {
 	Stop()
 }
 
-type Element interface {
-}
+type Element interface{}
+
+type UnmarshalFunc func([]byte) (any, error)

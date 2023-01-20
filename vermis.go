@@ -12,15 +12,15 @@ type SimpleVermis struct {
 	sync.RWMutex
 	data       []Element
 	file       *os.File
-	writerChan chan any
+	writerChan chan Element
 	doneChan   chan struct{}
 }
 
-func NewSimpleVermis(filePath string, f func([]byte) (any, error)) (*SimpleVermis, error) {
+func NewSimpleVermis(filePath string, f UnmarshalFunc) (*SimpleVermis, error) {
 	var err error
 
 	s := SimpleVermis{
-		writerChan: make(chan any),
+		writerChan: make(chan Element),
 		doneChan:   make(chan struct{}),
 	}
 
@@ -34,7 +34,6 @@ func NewSimpleVermis(filePath string, f func([]byte) (any, error)) (*SimpleVermi
 		}
 	}
 
-	// TODO: вычитываем старые данные и превращаем их в родные
 	if err = s.readByLines(s.file, f); err != nil {
 		return nil, err
 	}
@@ -58,6 +57,7 @@ func (s *SimpleVermis) add(el Element) {
 func (s *SimpleVermis) Len() int64 {
 	s.RLock()
 	defer s.RUnlock()
+
 	return int64(len(s.data))
 }
 
@@ -85,7 +85,6 @@ func (s *SimpleVermis) Stop() {
 
 func (s *SimpleVermis) writerBG() {
 	log.Println("start writerBG")
-	defer log.Println("finish writerBG")
 	for {
 		select {
 		case el := <-s.writerChan:

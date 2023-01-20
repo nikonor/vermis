@@ -35,7 +35,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	defer srv.Stop()
 
 	srv.Show("begin")
 	defer srv.Show("end")
@@ -44,6 +43,7 @@ func main() {
 		var d int
 		fmt.Scanf("%d", &d)
 		if d == 0 {
+			srv.Stop()
 			return
 		}
 
