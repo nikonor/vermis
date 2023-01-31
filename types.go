@@ -3,7 +3,8 @@ package vermis
 import "errors"
 
 var (
-	ErrNotSetMasterAddress = errors.New("don't set master address")
+	ErrNotSetHostAddress = errors.New("don't set host address")
+	ErrWal               = "wal error:: %w"
 )
 
 type Vermis interface {

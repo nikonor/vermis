@@ -1,6 +1,7 @@
 package simplevermis
 
 import (
+	"fmt"
 	"log"
 	"sync"
 
@@ -27,15 +28,15 @@ func NewSimpleVermis(filePath string, hostAddress string, f vermis.UnmarshalFunc
 	}
 
 	if len(hostAddress) == 0 {
-		return nil, vermis.ErrNotSetMasterAddress
+		return nil, vermis.ErrNotSetHostAddress
 	}
 
 	s.wal, err = wal.Open(filePath, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(vermis.ErrWal, err)
 	}
 	if err = s.readWal(f); err != nil {
-		return nil, err
+		return nil, fmt.Errorf(vermis.ErrWal, err)
 	}
 
 	go s.writerBG()
@@ -82,11 +83,11 @@ func (s *SimpleVermis) SetReplica() error {
 
 func (s *SimpleVermis) Stop() {
 	if err := s.wal.Sync(); err != nil {
-		log.Println(err.Error())
+		log.Println(fmt.Errorf(vermis.ErrWal, err))
 	}
 
 	if err := s.wal.Close(); err != nil {
-		log.Println(err.Error())
+		log.Println(fmt.Errorf(vermis.ErrWal, err))
 	}
 
 	close(s.doneChan)

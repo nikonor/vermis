@@ -2,7 +2,10 @@ package simplevermis
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+
+	"github.com/nikonor/vermis"
 )
 
 func (s *SimpleVermis) writerBG() {
@@ -17,7 +20,7 @@ func (s *SimpleVermis) writerBG() {
 			b = append(b, []byte("\n")...)
 
 			if err := s.wal.Write(s.Len(), b); err != nil {
-				log.Println("error on write::", err)
+				log.Println(fmt.Errorf(vermis.ErrWal, err))
 			}
 
 		case <-s.doneChan:
