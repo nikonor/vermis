@@ -2,9 +2,19 @@ package vermis
 
 import "errors"
 
+const (
+	TERMINATOR = '@'
+)
+
 var (
-	ErrNotSetHostAddress = errors.New("don't set host address")
-	ErrWal               = "wal error:: %w"
+	CMDAck = []byte("ack@")
+
+	ErrNotSetHostAddress    = errors.New("don't set host address")
+	ErrNotSetPort           = errors.New("don't set port")
+	ErrNotHost              = errors.New("instance is not host")
+	ErrServerAlreadyStarted = errors.New("server already started")
+	ErrWal                  = "wal error::%s::%w"
+	ErrNetwork              = "network error::%s::%w"
 )
 
 type Vermis interface {

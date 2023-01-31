@@ -31,13 +31,22 @@ func main() {
 		return e, nil
 	}
 
-	srv, err := simplevermis.NewSimpleVermis("/tmp/server.wal", "localhost:9991", f)
+	srv, err := simplevermis.NewSimpleVermis(
+		"/tmp/server.wal",
+		"localhost:9991",
+		9990,
+		f,
+	)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
 	srv.Show("begin")
 	defer srv.Show("end")
+
+	if err = srv.SetHost(); err != nil {
+		log.Fatalln(err)
+	}
 
 	time.Sleep(time.Second / 1000)
 	fmt.Print("Enter numbers + Enter ( 0 - for exit ): ")

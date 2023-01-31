@@ -3,6 +3,7 @@ package simplevermis
 import (
 	"fmt"
 	"log"
+	"net"
 	"sync"
 
 	"github.com/nikonor/vermis"
@@ -17,26 +18,35 @@ type SimpleVermis struct {
 	doneChan    chan struct{}
 	iAmHost     bool
 	hostAddress string
+	port        int
+	server      net.Listener
 }
 
-func NewSimpleVermis(filePath string, hostAddress string, f vermis.UnmarshalFunc) (*SimpleVermis, error) {
+// TODO: заменить логи на вызов логировщика??? или вообще убрать
+
+func NewSimpleVermis(filePath string, hostAddress string, port int, f vermis.UnmarshalFunc) (*SimpleVermis, error) {
 	var err error
 
 	s := SimpleVermis{
-		writerChan: make(chan vermis.Element),
-		doneChan:   make(chan struct{}), hostAddress: hostAddress,
+		writerChan:  make(chan vermis.Element),
+		doneChan:    make(chan struct{}),
+		hostAddress: hostAddress,
+		port:        port,
 	}
 
+	if s.port <= 0 {
+		return nil, vermis.ErrNotSetPort
+	}
 	if len(hostAddress) == 0 {
 		return nil, vermis.ErrNotSetHostAddress
 	}
 
 	s.wal, err = wal.Open(filePath, nil)
 	if err != nil {
-		return nil, fmt.Errorf(vermis.ErrWal, err)
+		return nil, fmt.Errorf(vermis.ErrWal, "open", err)
 	}
 	if err = s.readWal(f); err != nil {
-		return nil, fmt.Errorf(vermis.ErrWal, err)
+		return nil, fmt.Errorf(vermis.ErrWal, "read", err)
 	}
 
 	go s.writerBG()
@@ -71,23 +81,37 @@ func (s *SimpleVermis) GetFromIdx(idx uint64) []vermis.Element {
 func (s *SimpleVermis) SetHost() error {
 	log.Println("set instance as host")
 	s.iAmHost = true
-	return nil
-
+	return s.startServer()
 }
 
 func (s *SimpleVermis) SetReplica() error {
 	log.Println("set instance as replica")
+
+	if s.iAmHost {
+		log.Println("instance was host. stop server")
+		if err := s.stopServer(); err != nil {
+			return err
+		}
+	}
+
 	s.iAmHost = false
+
 	return nil
 }
 
 func (s *SimpleVermis) Stop() {
+	if s.iAmHost {
+		if err := s.stopServer(); err != nil {
+			log.Println(err.Error())
+		}
+	}
+
 	if err := s.wal.Sync(); err != nil {
-		log.Println(fmt.Errorf(vermis.ErrWal, err))
+		log.Println(fmt.Errorf(vermis.ErrWal, "sync", err))
 	}
 
 	if err := s.wal.Close(); err != nil {
-		log.Println(fmt.Errorf(vermis.ErrWal, err))
+		log.Println(fmt.Errorf(vermis.ErrWal, "close", err))
 	}
 
 	close(s.doneChan)

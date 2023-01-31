@@ -20,7 +20,7 @@ func (s *SimpleVermis) writerBG() {
 			b = append(b, []byte("\n")...)
 
 			if err := s.wal.Write(s.Len(), b); err != nil {
-				log.Println(fmt.Errorf(vermis.ErrWal, err))
+				log.Println(fmt.Errorf(vermis.ErrWal, "write", err))
 			}
 
 		case <-s.doneChan:
