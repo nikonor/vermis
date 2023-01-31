@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/nikonor/vermis"
+	"github.com/nikonor/vermis/simplevermis"
 )
 
 type E struct {
@@ -31,7 +31,7 @@ func main() {
 		return e, nil
 	}
 
-	srv, err := vermis.NewSimpleVermis("/tmp/server.wal", f)
+	srv, err := simplevermis.NewSimpleVermis("/tmp/server.wal", "localhost:9991", f)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -56,7 +56,7 @@ func main() {
 
 	}
 
-	// if err := srv.SetMaster(); err != nil {
+	// if err := srv.SetHost(); err != nil {
 	// 	log.Fatalln(err.Error())
 	// }
 	//

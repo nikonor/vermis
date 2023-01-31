@@ -1,12 +1,14 @@
-package vermis
+package simplevermis
 
 import (
 	"bufio"
 	"log"
 	"os"
+
+	"github.com/nikonor/vermis"
 )
 
-func (s *SimpleVermis) readByLines(file *os.File, f UnmarshalFunc) error {
+func (s *SimpleVermis) readByLines(file *os.File, f vermis.UnmarshalFunc) error {
 
 	scanner := bufio.NewScanner(file)
 
@@ -25,7 +27,7 @@ func (s *SimpleVermis) readByLines(file *os.File, f UnmarshalFunc) error {
 	return nil
 }
 
-func (s *SimpleVermis) readWal(f UnmarshalFunc) error {
+func (s *SimpleVermis) readWal(f vermis.UnmarshalFunc) error {
 	l, err := s.wal.LastIndex()
 	if err != nil {
 		return err

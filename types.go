@@ -1,11 +1,17 @@
 package vermis
 
+import "errors"
+
+var (
+	ErrNotSetMasterAddress = errors.New("don't set master address")
+)
+
 type Vermis interface {
-	Add(el any)
-	Len() int64
-	Get(idx int64) []any
-	SetMaster() error
-	SetSlave(address string) error
+	Add(el Element)
+	Len() uint64
+	GetFromIdx(uidx uint64) []Element
+	SetHost() error
+	SetReplica() error
 	Stop()
 }
 

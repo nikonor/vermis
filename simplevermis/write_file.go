@@ -1,4 +1,4 @@
-package vermis
+package simplevermis
 
 import (
 	"encoding/json"
