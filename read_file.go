@@ -24,3 +24,24 @@ func (s *SimpleVermis) readByLines(file *os.File, f UnmarshalFunc) error {
 	}
 	return nil
 }
+
+func (s *SimpleVermis) readWal(f UnmarshalFunc) error {
+	l, err := s.wal.LastIndex()
+	if err != nil {
+		return err
+	}
+	for i := uint64(1); i <= l; i++ {
+		body, err := s.wal.Read(i)
+		if err != nil {
+			return err
+		}
+		if e, err := f(body); err != nil {
+			return err
+		} else {
+			s.add(e)
+		}
+
+	}
+
+	return nil
+}

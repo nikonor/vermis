@@ -31,7 +31,7 @@ func main() {
 		return e, nil
 	}
 
-	srv, err := vermis.NewSimpleVermis("/tmp/server.txt", f)
+	srv, err := vermis.NewSimpleVermis("/tmp/server.wal", f)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
